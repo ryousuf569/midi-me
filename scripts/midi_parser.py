@@ -17,3 +17,4 @@ def midi_data(midi_track):
 note = md.Message.from_str(midi_data(midi.tracks)[0])
 print(note)
 print(note.note)
+print(note.time) 
