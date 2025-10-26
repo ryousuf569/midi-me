@@ -14,6 +14,6 @@ def midi_data(midi_track):
                 pass
     return midi_data_list
 
-nigger = md.Message.from_str(midi_data(midi.tracks)[0])
-print(nigger)
-print(nigger.note)
+note = md.Message.from_str(midi_data(midi.tracks)[0])
+print(note)
+print(note.note)
