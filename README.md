@@ -1,1 +1,1 @@
-Postponed, randomly got inspo for a seperate project, and am currently working on that instead
+Revamped the whole project idea and going to work on it over the break
