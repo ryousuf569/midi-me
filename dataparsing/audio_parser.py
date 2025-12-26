@@ -1,10 +1,14 @@
 import librosa
 import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import sqlite3
 
 def make_stem_graph(path):
 
     def load_stem(path, sr=22050, mono=True):
-        y, sr = librosa.load(path, sr=sr, mono=mono) # y is us loading the waveform and sr is sample rate
+        # y is us loading the waveform and sr is sample rate
+        y, sr = librosa.load(path, sr=sr, mono=mono)
         y = librosa.util.normalize(y)
         return y, sr
     
@@ -81,13 +85,112 @@ def make_stem_graph(path):
 
             graph[i] = {
                 "next": i + 1,
-                "fatigue_cost": fatigue}  
+                "fatigue_cost": fatigue,
+                "energy" : abs(a["energy"] - b["energy"]) * 0.3,
+                "brightness": abs(a["brightness"] - b["brightness"]) * 0.3,
+                "spectrum_changes" : abs(a["spectrum_changes"] - b["spectrum_changes"]) * 0.4}  
             
         return graph
     
     y, sr = load_stem(path)
     features = stem_features(y, sr)
     nodes = featurenodes(features)
+
     return audio_graph(nodes)
 
-print(make_stem_graph("tempstems/Marvins Room_drums.wav"))
+drum_graph = make_stem_graph("tempstems/Marvins Room_drums.wav")
+bass_graph = make_stem_graph("tempstems/Marvins Room_bass.wav")
+other_graph = make_stem_graph("tempstems/Marvins Room_other.wav")
+vocal_graph = make_stem_graph("tempstems/Marvins Room_vocals.wav")
+
+def extract_component_arrays(graph):
+    keys = sorted(graph.keys())
+
+    return {
+        "energy": np.array([graph[k]["energy"] for k in keys]),
+        "brightness": np.array([graph[k]["brightness"] for k in keys]),
+        "spectrum_changes": np.array([graph[k]["spectrum_changes"] for k in keys])
+    }
+
+
+def mean_song_graph(*graphs):
+
+    component_arrays = [extract_component_arrays(g) for g in graphs]
+
+    # find shortest stem so everything aligns in time
+    min_len = min(len(c["energy"]) for c in component_arrays)
+
+    # trim all arrays
+    for c in component_arrays:
+        for key in c:
+            c[key] = c[key][:min_len]
+
+    # stack + mean each component
+    mean_energy = np.mean(
+        np.stack([c["energy"] for c in component_arrays], axis=0),
+        axis=0
+    )
+
+    mean_brightness = np.mean(
+        np.stack([c["brightness"] for c in component_arrays], axis=0),
+        axis=0
+    )
+
+    mean_spectrum = np.mean(
+        np.stack([c["spectrum_changes"] for c in component_arrays], axis=0),
+        axis=0
+    )
+
+    # reconstruct song graph
+    song_graph = {}
+    for i in range(min_len):
+        fatigue_cost = (
+            mean_energy[i]
+            + mean_brightness[i]
+            + mean_spectrum[i]
+        )
+
+        song_graph[i] = {
+            "next": i + 1 if i < min_len - 1 else None,
+            "fatigue_cost": float(fatigue_cost),
+            "energy": float(mean_energy[i]),
+            "brightness": float(mean_brightness[i]),
+            "spectrum_changes": float(mean_spectrum[i])
+        }
+
+    return song_graph
+
+song_graph = mean_song_graph(
+    drum_graph,
+    bass_graph,
+    other_graph,
+    vocal_graph)
+
+mm = MinMaxScaler()
+
+run_id = 1
+df = pd.DataFrame(song_graph).T
+df["run_id"] = run_id
+
+fatigue_to_scale = df["fatigue_cost"].values.reshape(-1, 1)
+scaled_fatigue = mm.fit_transform(fatigue_to_scale)
+df["fatigue_cost"] = scaled_fatigue
+
+energy_to_scale = df["energy"].values.reshape(-1, 1)
+scaled_energy = mm.fit_transform(energy_to_scale)
+df["energy"] = scaled_energy
+
+brightness_to_scale = df["brightness"].values.reshape(-1, 1)
+scaled_brightness = mm.fit_transform(brightness_to_scale)
+df["brightness"] = scaled_brightness
+
+sc_to_scale = df["spectrum_changes"].values.reshape(-1, 1)
+scaled_sc = mm.fit_transform(sc_to_scale)
+df["spectrum_changes"] = scaled_sc
+
+db_path = 'data/midi_me.db'
+conn = sqlite3.connect(db_path)
+df.to_sql("audio_fatigue",
+                     conn,
+                     if_exists="replace",
+                     index=False)
