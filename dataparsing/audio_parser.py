@@ -98,10 +98,10 @@ def make_stem_graph(path):
 
     return audio_graph(nodes)
 
-drum_graph = make_stem_graph("tempstems/Marvins Room_drums.wav")
-bass_graph = make_stem_graph("tempstems/Marvins Room_bass.wav")
-other_graph = make_stem_graph("tempstems/Marvins Room_other.wav")
-vocal_graph = make_stem_graph("tempstems/Marvins Room_vocals.wav")
+drum_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_drums.wav")
+bass_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_bass.wav")
+other_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_other.wav")
+vocal_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_vocals.wav")
 
 def extract_component_arrays(graph):
     keys = sorted(graph.keys())
@@ -168,9 +168,9 @@ song_graph = mean_song_graph(
 
 mm = MinMaxScaler()
 
-run_id = 1
+song_id = 3
 df = pd.DataFrame(song_graph).T
-df["run_id"] = run_id
+df["song_id"] = song_id
 
 fatigue_to_scale = df["fatigue_cost"].values.reshape(-1, 1)
 scaled_fatigue = mm.fit_transform(fatigue_to_scale)
@@ -192,5 +192,5 @@ db_path = 'data/midi_me.db'
 conn = sqlite3.connect(db_path)
 df.to_sql("audio_fatigue",
                      conn,
-                     if_exists="replace",
+                     if_exists="append",
                      index=False)
