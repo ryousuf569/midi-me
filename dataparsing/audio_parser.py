@@ -98,10 +98,10 @@ def make_stem_graph(path):
 
     return audio_graph(nodes)
 
-drum_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_drums.wav")
-bass_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_bass.wav")
-other_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_other.wav")
-vocal_graph = make_stem_graph("tempstems/Pino - Love This Pain Away Official Visualizer_vocals.wav")
+drum_graph = make_stem_graph("tempstems/SpotiDownloader.com - Assumptions - Sam Gellaitry_drums.wav")
+bass_graph = make_stem_graph("tempstems/SpotiDownloader.com - Assumptions - Sam Gellaitry_bass.wav")
+other_graph = make_stem_graph("tempstems/SpotiDownloader.com - Assumptions - Sam Gellaitry_other.wav")
+vocal_graph = make_stem_graph("tempstems/SpotiDownloader.com - Assumptions - Sam Gellaitry_vocals.wav")
 
 def extract_component_arrays(graph):
     keys = sorted(graph.keys())
@@ -168,7 +168,7 @@ song_graph = mean_song_graph(
 
 mm = MinMaxScaler()
 
-song_id = 3
+song_id = 4
 df = pd.DataFrame(song_graph).T
 df["song_id"] = song_id
 

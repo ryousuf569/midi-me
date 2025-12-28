@@ -4,7 +4,7 @@ import numpy as np
 
 conn = sqlite3.connect("data/midi_me.db")
 cursor = conn.cursor()
-sql_query = "SELECT song_id, next, fatigue_cost, energy, brightness, spectrum_changes FROM audio_fatigue WHERE song_id=2"
+sql_query = "SELECT song_id, next, fatigue_cost, energy, brightness, spectrum_changes FROM audio_fatigue ORDER BY song_id"
 
 
 df = pd.read_sql(sql_query, conn)
@@ -65,17 +65,23 @@ df["novelty"] = 0.5 * df["spectrum_mean"] + 0.5 * df["fatigue_mean"]
 df["stationarity"] = 1 - (((0.5 * df["fatigue_var"]) + (0.5 * df["spectrum_var"])) / np.percentile(((0.5 * df["fatigue_var"]) + (0.5 * df["spectrum_var"])), 90)).clip(0, 1)
 
 def classify_state(row):
-    if row["intensity"] < 0.2 and row["stationarity"] > 0.68:
+    '''
+    running a bunch of tests, i noticed these numbers are sort of the "sweet spot", 
+    stationarity above 60% usually indicates the song isn't varying over the past 15 seconds
+    pairing that with low or high intensity or change levels, we can classify a state for each
+    second based off rolling windows and variances of the past 15 seconds.
+    '''
+    if row["intensity"] < 0.2 and row["stationarity"] > 0.6:
         return "boring"
-    elif row["novelty"] < 0.2 and row["stationarity"] > 0.68:
+    elif row["novelty"] < 0.2 and row["stationarity"] > 0.6:
         return "boring"
-    elif row["intensity"] > 0.4 and row["stationarity"] > 0.68:
+    elif row["intensity"] > 0.3 and row["stationarity"] > 0.6:
         return "overstimulating"
-    elif row["novelty"] > 0.4 and row["stationarity"] > 0.68:
+    elif row["novelty"] > 0.3 and row["stationarity"] > 0.6:
         return "overstimulating"
     else:
         return "engaging"
 
 df["state"] = df.apply(classify_state, axis=1)
-
-df.to_csv('data/song_analysis.csv')
+# run3 = df[df["song_id"]== 3].copy()
+# df.to_csv('data/state_analysis.csv')
