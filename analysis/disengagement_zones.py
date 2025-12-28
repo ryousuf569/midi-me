@@ -44,9 +44,9 @@ def build_emissions(song_df, model):
     return emissions
 
 emissions_matrix = build_emissions(run4, pipe)
-transition_matrix_df = (pd.crosstab(
+transition_matrix = (pd.crosstab(
     pd.Series(transitions[:-1], name='From'), # current state
     pd.Series(transitions[1:], name='To'), # next state
     normalize=0)).to_numpy() # normalize across each row
 
-print(emissions_matrix)
+print(transition_matrix)
