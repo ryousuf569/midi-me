@@ -1,13 +1,15 @@
 # MIDI.me — Listener Engagement & Disengagement Analysis
 
-**Demo:** `./demo.gif`
+## Demo
+
+![MIDI.me Demo](demo.gif)
 
 MIDI.me is an interpretable music-analysis system that detects **listener disengagement regions** in songs by modeling audio features with a **Hidden Markov Model (HMM)** and producing a **per-second disengagement risk score**.  
 The system is designed to support **time-localized, explainable creative decisions**, not black-box predictions.
 
 ---
 
-## 🔍 What This Project Does
+## What This Project Does
 
 - Identifies **high-risk disengagement regions** covering **~18–25% of track duration** across **40 songs**
 - Infers latent listener engagement states over time using **HMM + Viterbi**
@@ -17,7 +19,7 @@ The system is designed to support **time-localized, explainable creative decisio
 
 ---
 
-## 🧠 Core Modeling Approach
+## Core Modeling Approach
 
 ### 1. Audio Feature Extraction
 Audio features are extracted using `librosa` at a fine temporal resolution (per-second), including:
@@ -57,7 +59,7 @@ This produces a continuous risk signal suitable for visualization and downstream
 
 ---
 
-## 📊 Visualization & Analysis Pipeline
+## Visualization & Analysis Pipeline
 
 - Local visualization tools for:
   - Engagement state timelines
@@ -70,7 +72,7 @@ This produces a continuous risk signal suitable for visualization and downstream
 
 ---
 
-## 📘 Model Intuition & Theory
+## Model Intuition & Theory
 
 This project emphasizes **interpretability and causal reasoning** so results can directly inform creative decisions.
 
@@ -81,11 +83,11 @@ Detailed explanations are provided for:
 - Disengagement risk formulation
 - Design tradeoffs and modeling assumptions
 
-👉 See the `research/` folder for full mathematical and conceptual details.
+See the `research/` folder for full mathematical and conceptual details.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - Python
 - librosa
@@ -96,7 +98,7 @@ Detailed explanations are provided for:
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
 - Music producers identifying listener drop-off points
 - Comparing multiple versions of a track
@@ -105,10 +107,11 @@ Detailed explanations are provided for:
 
 ---
 
-## 🚀 Status & Future Work
+## Status & Future Work
 
 Planned extensions include:
 - Larger datasets and cross-genre evaluation
 - Real-time analysis
 - Plugin / DAW-integrated workflows
 - Deeper modeling of long-range listener fatigue
+
