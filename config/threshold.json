@@ -1,0 +1,31 @@
+{
+  "silence": {
+    "max_ratio": 0.20,
+    "_comment": "If more than 20% of frames fall below the RMS silence threshold, the file is considered to contain excessive silence or dead air."
+  },
+
+  "dynamic_range": {
+    "min_db": 8.0,
+    "_comment": "Dynamic range below 8 dB typically indicates heavy compression or overly flattened audio dynamics."
+  },
+
+  "noise": {
+    "max_zcr_p95": 0.25,
+    "_comment": "A 95th percentile zero-crossing rate above 0.25 suggests excessive high-frequency noise or distortion."
+  },
+
+  "brightness": {
+    "max_centroid_p95_hz": 6000,
+    "_comment": "A high spectral centroid (95th percentile above 6 kHz) may indicate overly harsh or brittle frequency content."
+  },
+
+  "transients": {
+    "min_onset_peak_ratio": 2.0,
+    "_comment": "Low onset peak-to-mean ratios (<2.0) can indicate over-compression or loss of transient contrast."
+  },
+
+  "policy": {
+    "warn_margin": 0.10,
+    "_comment": "Metrics within 10% of a threshold may be flagged as WARN instead of FAIL to indicate borderline quality issues."
+  }
+}
